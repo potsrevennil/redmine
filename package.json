@@ -17,6 +17,7 @@
     "eslint-plugin-react": "^5.2.2"
   },
   "dependencies": {
+    "csv-parser": "^1.9.3",
     "plotly": "^1.0.6"
   }
 }
