@@ -20,21 +20,7 @@ const vData = [];
 fs.createReadStream(logFile)
   .pipe(stream)
   .on('data', (data) => {
-    const vecDate = data.time.split(' ')[0].split('/');
-    const vecTime = data.time.split(' ')[1].split(':');
-    const d = {
-      usr: data.usr,
-      status: data.status,
-      year: vecDate[0],
-      month: vecDate[1],
-      day: vecDate[2],
-      hour: vecTime[0],
-      min: vecTime[1],
-      agent: data.agent,
-      foo: data.foo,
-      bar: data.bar,
-    };
-    vData.push(d);
+    vData.push(data);
   })
   .on('end', () => {
     writeStream.write(JSON.stringify(vData));

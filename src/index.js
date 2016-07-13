@@ -1,16 +1,17 @@
 const http = require('http');
 
-var options = {
+const options = {
   hostname: 'localhost',
   port: 3000,
   path: '/',
   method: 'GET',
 };
+var vData;
 
-var req = http.request(options, (res) => {
-  //console.log(`STATUS:${res.statusCode}`);
+const req = http.request(options, (res) => {
   res.on('data', (data) => {
-    console.log(data.toString('utf8'));
+    vData = JSON.parse(JSON.stringify((data.toString())));
+    console.log(vData);
   });
 });
 
