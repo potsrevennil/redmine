@@ -14,10 +14,12 @@
     "eslint-config-airbnb": "^9.0.1",
     "eslint-plugin-import": "^1.10.2",
     "eslint-plugin-jsx-a11y": "^1.2.0",
-    "eslint-plugin-react": "^5.2.2"
+    "eslint-plugin-react": "^5.2.2",
+    "express-generator": "^4.13.4"
   },
   "dependencies": {
     "csv-parser": "^1.9.3",
+    "express": "^4.14.0",
     "plotly": "^1.0.6"
   }
 }
