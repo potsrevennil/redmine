@@ -2,6 +2,7 @@ import 'babel-polyfill';
 import fetch from 'isomorphic-fetch';
 import React from 'react';
 import { render } from 'react-dom';
+import Chart from './Chart';
 
 
 var  cData = [];
@@ -29,4 +30,10 @@ fetch('/api')
         cData[cData.length - 1].amount += 1;
       }
     });
+
+    render(
+      <Chart cData={cData} />,
+      document.getElementById('root')
+    );
   });
+
