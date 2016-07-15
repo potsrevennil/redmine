@@ -1,17 +1,9 @@
-const http = require('http');
+import 'babel-polyfill';
+import { polyfill } from 'es6-promise';
+import fetch from 'isomorphic-fetch';
 
-const options = {
-  hostname: 'localhost',
-  port: 3000,
-  path: '/',
-  method: 'GET',
-};
-var vData;
-
-const req = http.request(options, (res) => {
-  res.on('data', (data) => {
-    vData = JSON.parse(JSON.stringify((data.toString())));
-  });
-});
-
-req.end();
+fetch('/api')
+  .then(res => res.json())
+  .then(data => {
+    console.log(data);
+  })
