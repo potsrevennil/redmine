@@ -23,11 +23,11 @@ fetch('/api')
     data.sort(compare);
 
     data.forEach( (d) => {
-      if (cData.length === 0 || new Date(d.time).getTime() !== cData[cData.length - 1].time.getTime()) {
-        cData.push( {time: new Date(d.time), amount: 1} );
+      if (cData.length === 0 || new Date(d.time).getTime() !== cData[cData.length - 1][0].getTime()) {
+        cData.push( [new Date(d.time), 1] );
       }
       else {
-        cData[cData.length - 1].amount += 1;
+        cData[cData.length - 1][1] += 1;
       }
     });
 
