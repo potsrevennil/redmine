@@ -66,6 +66,7 @@ class StackedChart extends Component {
               labels: labels,
               xlabel: 'Time',
               ylabel: 'Number of Login users',
+              stackedGraph: true,
               fillGraph: true,
             }
           );
