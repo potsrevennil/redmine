@@ -5,22 +5,13 @@ import dygraph from 'dygraphs';
 class Chart extends Component {
   render() {
     const data = this.props.route.data;
-    let cData = [];
-    data.forEach((d) => {
-      if (cData.length === 0 ||
-        new Date(d.time).getTime() !== cData[cData.length - 1][0].getTime()) {
-        cData.push([new Date(d.time), 1]);
-      } else {
-        cData[cData.length - 1][1] += 1;
-      }
-    });
     return (
       <div
         id="chart"
         ref={() => {
           new dygraph(
             document.getElementById('chart'),
-            cData,
+            data,
             {
               title: 'Number of Login users V.S. Time',
               height: 640,
