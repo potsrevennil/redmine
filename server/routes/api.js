@@ -30,19 +30,31 @@ fs.readdir(logDir, (err, files) => {
   });
 });
 
+
+
 /* GET home page. */
 router.get('/:date', function(req, res, next) {
-  fs.readFile(`${DBDir}/EVENTS_${req.params.date}.json`, 'utf-8', (err, data) => {
-    if (err) {
-      return next(err);
-    }
-    try {
-      const jdata = JSON.parse(data);
-      return res.json(jdata);
-    } 
-    catch (errr) {
-      return next(errr);
-    }
+  fs.readFile(`${DBDir}/EVENTS_${req.params.date}.json`, 'utf-8', (err, data1) => {
+    const date = req.params.date;
+    const today = new Date(`${date.substr(0, 4)}/${date.substr(4, 2)}/${date.substr(6, 2)}`);
+    const yesterday = new Date(today.setDate(today.getDate() - 1));
+    const yDate = yesterday.getFullYear() 
+      + ('0' + (yesterday.getMonth()+1)).slice(-2)
+      + ('0' + yesterday.getDate()).slice(-2);
+
+    fs.readFile(`${DBDir}/EVENTS_${yDate}.json`, 'utf-8', (err, data2) => {
+    
+      if (err) {
+        return next(err);
+      }
+      try {
+        const jdata = JSON.parse(data2).concat(JSON.parse(data1));
+        return res.json(jdata);
+      } 
+      catch (errr) {
+        return next(errr);
+      }
+    })
   }); 
 });
 

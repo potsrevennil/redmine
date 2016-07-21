@@ -18,7 +18,7 @@ class Chart extends Component {
       + ('0' + (date.getMonth()+1)).slice(-2)
       + ('0' + date.getDate()).slice(-2);
     //fetch(`/api/${sDate}`)
-    fetch(`/api/20160419`)
+    fetch(`/api/20160420`)
       .then(res => res.json())
       .then(data => {
         if (data.length !== 0 ) {
