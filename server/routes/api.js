@@ -32,7 +32,7 @@ fs.readdir(logDir, (err, files) => {
 
 /* GET home page. */
 router.get('/:date', function(req, res, next) {
-  fs.readFile(`${DBDir}/${fileName}.json`, 'utf-8', (err, data) => {
+  fs.readFile(`${DBDir}/EVENTS_${req.params.date}.json`, 'utf-8', (err, data) => {
     if (err) {
       return next(err);
     }
