@@ -18,17 +18,20 @@ class Chart extends Component {
       + ('0' + (date.getMonth()+1)).slice(-2)
       + ('0' + date.getDate()).slice(-2);
     //fetch(`/api/${sDate}`)
-    fetch(`/api/20160420`)
+    fetch(`/api/20160419`)
       .then(res => res.json())
       .then(data => {
         if (data.length !== 0 ) {
           let cData = [];
           data.forEach((d, i) => {
-            if (cData.length === 0 ||
-              new Date(d.time).getTime() !== cData[cData.length - 1][0].getTime()) {
-                cData.push([new Date(d.time), 1]);
-            } else {
-              cData[cData.length - 1][1] += 1;
+            if (i === 0) {
+              cData.push([new Date(d.time), d.usr.length]);
+            } 
+            else if (new Date(d.time).getTime() !== cData[cData.length - 1][0].getTime()) {
+              cData.push([new Date(d.time), d.usr.length]);
+            } 
+            else {
+              cData[cData.length - 1][1] = d.usr.length;
             }
           });
           this.setState({
@@ -40,6 +43,7 @@ class Chart extends Component {
 
   render() {
     const data = this.state.data;
+    console.log(data);
     return (
       <div>
         <div

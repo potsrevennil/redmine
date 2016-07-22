@@ -44,7 +44,6 @@ fs.readdir(logDir, (err, files) => {
             obj['time'] = faa[2];
             obj['agent'] = faa[3];
             obj['messageId'] = faa[4];
-            //vData.push(obj);
             const writeStream = fs.createWriteStream(DB_PATH, {fd: fs.openSync(DB_PATH, 'a'), flags: 'r+'});
             writeStream.write(sep + JSON.stringify(obj));
             if (!sep) {
