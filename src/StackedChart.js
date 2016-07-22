@@ -24,44 +24,52 @@ class StackedChart extends Component {
       .then(res => res.json())
       .then(data => {
         let scData = [];
-        let agents = [];
-        function checkNewAgent(d, dPrev, noNewAgent) {
-          if ( !noNewAgent ) {
-            scData.forEach((cd) => {
-              cd.push(0);
-            });
-            scData[scData.length - 1][scData[scData.length - 1].length - 1] = d.usr.length - dPrev.usr.length;
-            agents.push(d.agent);
-          }
-        }
+        const agents = ['CSB-i', 'CSB-A', 'CSB-w', 'CDt', 'LoginApp for Windows', 'Mac', 'Others'];
+        //function checkNewAgent(d, dPrev, noNewAgent) {
+          //if ( !noNewAgent ) {
+            //scData.forEach((cd) => {
+              //cd.push(0);
+            //});
+            //scData[scData.length - 1][scData[scData.length - 1].length - 1] = d.usr.length - dPrev.usr.length;
+            //agents.push(d.agent);
+          //}
+        //}
 
         data.forEach((d, i) => {
           if (i === 0) {
-            scData.push([new Date(d.time), d.usr.length]);
-            agents.push(d.agent);
-          
+            scData.push(new Array(agents.length + 1));
+            scData[scData.length - 1][0] = new Date(d.time);
+            agents.forEach((a, ia) => {
+              if (d.agent === a) {
+                scData[scData.length - 1][ia + 1] = d.usr.length;
+              } else {
+                scData[scData.length - 1][ia + 1] = 0;
+              }
+            });
+            //scData.push([new Date(d.time), d.usr.length]);
+            //agents.push(d.agent);
           } else if (new Date(d.time).getTime() !== scData[scData.length - 1][0].getTime()) {
-            let noNewAgent = false;
+            //let noNewAgent = false;
             scData.push(new Array(agents.length + 1));
             scData[scData.length - 1][0] = new Date(d.time);
             agents.forEach((a, ia) => {
               scData[scData.length - 1][ia + 1] = scData[scData.length - 2][ia + 1];
               if (d.agent === a) {
                 scData[scData.length - 1][ia + 1] += d.usr.length - data[i - 1].usr.length; // new users + users' num of previous time
-                noNewAgent = true;
+                //noNewAgent = true;
               }
             });
-            checkNewAgent(d, data[i - 1], noNewAgent);
+            //checkNewAgent(d, data[i - 1], noNewAgent);
           } 
           else {
-            let noNewAgent = false;
+            //let noNewAgent = false;
             agents.forEach((a, ia) => {
               if (d.agent === a) {
                 scData[scData.length - 1][ia + 1] += d.usr.length - data[i - 1].usr.length;
-                noNewAgent = true;
+                //noNewAgent = true;
               }
             });
-            checkNewAgent(d, data[i - 1], noNewAgent);
+            //checkNewAgent(d, data[i - 1], noNewAgent);
           }
         });
         this.setState({
@@ -81,7 +89,7 @@ class StackedChart extends Component {
           ref={() => {
             const labels = ['Time'];
             agents.forEach((a, i) => {
-              labels.push(`usr${i}`);
+              labels.push(a);
             });
             new dygraph(
               document.getElementById('stackedchart'),

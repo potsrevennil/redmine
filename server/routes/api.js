@@ -42,8 +42,23 @@ fs.readdir(logDir, (err, files) => {
             }
             
             obj['time'] = faa[2];
-            obj['agent'] = faa[3];
             obj['messageId'] = faa[4];
+
+            if (faa[3].indexOf('Cachatto%2F') !== -1 || faa[3].indexOf('Cachatto-ipad/') !== -1) {
+              obj['agent'] = 'CSB-i';
+            } else if (faa[3].indexOf('Cachatto-Android') !== -1) {
+              obj['agent'] = 'CSB-A';
+            } else if (faa[3].indexOf('Cachatto-Agent') !== -1) {
+              obj['agent'] = 'CSB-W';
+            } else if (faa[3].indexOf('CACHATTO Desktop%2F') !== -1) {
+              obj['agent'] = 'CDt';
+            } else if (faa[3].indexOf('CachattoLoginApp%2F') !== -1) {
+              obj['agent'] = 'LoginApp for Windows';
+            } else if (faa[3].indexOf('Cachatto-Mac%2F') !== -1) {
+              obj['agent'] = 'Mac';
+            } else {
+              obj['agent'] = 'Others';
+            }
             const writeStream = fs.createWriteStream(DB_PATH, {fd: fs.openSync(DB_PATH, 'a'), flags: 'r+'});
             writeStream.write(sep + JSON.stringify(obj));
             if (!sep) {
