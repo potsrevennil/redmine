@@ -79,7 +79,7 @@ import StackedChart from './StackedChart';
         <Route path="/">
           <IndexRedirect to="/" />
           <Route path="/chart" component={Chart} />
-          <Route path="/stackedchart" component={StackedChart} data={[]} agents={[]}/>
+          <Route path="/stackedchart" component={StackedChart} />
         </Route>
       </Router>,
       document.getElementById('root')
