@@ -75,40 +75,52 @@ fs.readdir(logDir, (err, files) => {
 
 /* GET home page. */
 router.get('/:date', function(req, res, next) {
-  fs.readFile(`${DBDir}/EVENTS_${req.params.date}.json`, 'utf-8', (err1, data1) => {
-    const date = req.params.date;
-    const today = new Date(`${date.substr(0, 4)}/${date.substr(4, 2)}/${date.substr(6, 2)}`);
-    const yesterday = new Date(today.setDate(today.getDate() - 1));
-    const yDate = yesterday.getFullYear() 
-      + ('0' + (yesterday.getMonth()+1)).slice(-2)
-      + ('0' + yesterday.getDate()).slice(-2);
-    try {
-      const stats = fs.lstatSync(`${DBDir}/EVENTS_${yDate}.json`);
-      if (stats.isFile()) {
-        fs.readFile(`${DBDir}/EVENTS_${yDate}.json`, 'utf-8', (err2, data2) => {
-        
-          if (err2 || err1) {
-            return next(err2);
+  try {
+    const stats1 = fs.lstatSync(`${DBDir}/EVENTS_${req.params.date}.json`);
+    if (stats1.isFile()) {
+      fs.readFile(`${DBDir}/EVENTS_${req.params.date}.json`, 'utf-8', (err1, data1) => {
+        const date = req.params.date;
+        const today = new Date(`${date.substr(0, 4)}/${date.substr(4, 2)}/${date.substr(6, 2)}`);
+        const yesterday = new Date(today.setDate(today.getDate() - 1));
+        const yDate = yesterday.getFullYear() 
+          + ('0' + (yesterday.getMonth()+1)).slice(-2)
+          + ('0' + yesterday.getDate()).slice(-2);
+        try {
+          const stats2 = fs.lstatSync(`${DBDir}/EVENTS_${yDate}.json`);
+          if (stats2.isFile()) {
+            fs.readFile(`${DBDir}/EVENTS_${yDate}.json`, 'utf-8', (err2, data2) => {
+            
+              if (err2 || err1) {
+                return next(err2);
+              }
+              try {
+                const jdata = JSON.parse(data2).concat(JSON.parse(data1));
+                return res.json(jdata);
+              } catch (errr2) {
+                return next(errr2);
+              }
+            })
+          }
+        } catch(e2) {
+          if (err1) {
+            return next(err1);
           }
           try {
-            const jdata = JSON.parse(data2).concat(JSON.parse(data1));
-            return res.json(jdata);
-          } catch (errr2) {
-            return next(errr2);
+            return res.json(JSON.parse(data1));
+          } catch (errr1) {
+            return next(errr1);
           }
-        })
-      }
-    } catch(e) {
-      if (err1) {
-        return next(err1);
-      }
-      try {
-        return res.json(JSON.parse(data1));
-      } catch (errr1) {
-        return next(errr1);
-      }
+        }
+      });
     }
-  }); 
+  } catch (e1) {
+    return;
+  }
 });
 
+//router.get('/:month', function(req, res, next) {
+  
+
+
+//})
 module.exports = router;
