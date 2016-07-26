@@ -9,18 +9,52 @@ class StackedChart extends Component {
       data: [[new Date(0), 0]],
       agents: [''],
     };
-    this.handleClick = this.handleClick.bind(this);
+    this.handleClickDay = this.handleClickDay.bind(this);
+    this.handleClickMonth = this.handleClickMonth.bind(this);
 
   }
 
 
-  handleClick() {
+  handleClickDay() {
     const date = new Date();
     const sDate = date.getFullYear() 
       + ('0' + (date.getMonth()+1)).slice(-2)
       + ('0' + date.getDate()).slice(-2);
     //fetch(`/api/${sDate}`)
     fetch(`/api/20160601`)
+      .then(res => res.json())
+      .then(data => {
+        let scData = [];
+        const agents = ['CSB-i', 'CSB-A', 'CSB-W', 'CDt', 'LoginApp', 'Mac', 'Others'];
+
+        data.forEach((d, i) => {
+          if (i === 0 ||
+            new Date(d.time).getTime() !== scData[scData.length - 1][0].getTime()) {
+            scData.push(new Array(agents.length + 1));
+            scData[scData.length - 1][0] = new Date(d.time);
+            agents.forEach((a, ia) => {
+              scData[scData.length - 1][ia + 1] = d.usr[a].length;
+            });
+          } 
+          else {
+            agents.forEach((a, ia) => {
+              scData[scData.length - 1][ia + 1] = d.usr[a].length;
+            });
+          }
+        });
+        this.setState({
+          data: scData,
+          agents: agents
+        });
+      });
+  }
+
+  handleClickMonth() {
+    const date = new Date();
+    const sDate = date.getFullYear() 
+      + ('0' + (date.getMonth()+1)).slice(-2);
+    //fetch(`/api/${sDate}`)
+    fetch(`/api/2016/05`)
       .then(res => res.json())
       .then(data => {
         let scData = [];
@@ -76,7 +110,8 @@ class StackedChart extends Component {
             );
           }}
           />
-        <button style={{width:'120px', height:'60px'}} onClick={this.handleClick}>day</button>
+        <button style={{width:'120px', height:'60px'}} onClick={this.handleClickDay}>Day</button>
+        <button style={{width:'120px', height:'60px'}} onClick={this.handleClickMonth}>Month</button>
       </div>
     );
   

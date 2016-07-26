@@ -128,23 +128,27 @@ router.get('/:date', function(req, res, next) {
   }
 });
 
-//router.get('/:year/:month', function(req, res, next) {
-  //fs.readdir(DBDir, (err, files) => {
-    //var jdata = [];
-    //const monthFiles = [];
-    //files.forEach((dbfile) => {
-      //if(dbfile.indexOf(`${req.params.year}${req.params.month}`) !== -1) {
-        //monthFiles.push(dbfile);
-      //}
-    //});
-    //function readCallback(err, data) {};
+router.get('/:year/:month', function(req, res, next) {
+  console.log('Fetch');
+  fs.readdir(DBDir, (err, files) => {
+    const monthFiles = [];
+    files.forEach((dbfile) => {
+      if(dbfile.indexOf(`${req.params.year}${req.params.month}`) !== -1) {
+        monthFiles.push(dbfile);
+      }
+    });
+    function readCallback(err, data) {};
 
-    //function readAsync(file, readCallback) {
-      //fs.readFile(`${DBDir}/${file}`, 'utf-8', readCallback);
-    //};
-    //async.map(monthFiles, readAsync, (err, result) => {
-      //return res.json(JSON.parse(JSON.stringify(result)));
-    //})
-  //});
-//})
+    function readAsync(file, readCallback) {
+      fs.readFile(`${DBDir}/${file}`, 'utf-8', readCallback);
+    };
+    async.map(monthFiles, readAsync, (err, result) => {
+      var jdata = [];
+      async.each(result, (r) => {
+        jdata = jdata.concat(JSON.parse(r));
+      }, (err) => {});
+      return res.json(jdata);
+    })
+  });
+})
 module.exports = router;

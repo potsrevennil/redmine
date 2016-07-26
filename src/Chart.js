@@ -52,21 +52,25 @@ class Chart extends Component {
     const sMonth = date.getFullYear()
       + ('0' + (date.getMonth()+1)).slice(-2);
     //fetch(`/api/${sMonth}`)
-    fetch('/api/201605')
+    fetch('/api/2016/05')
       .then(res => res.json())
-      .then(date => {
-        console.log(data);
+      .then(data => {
         if (data.length !== 0 ) {
           let cData = [];
           data.forEach((d, i) => {
-            if (i === 0) {
-              cData.push([new Date(d.time), d.usr.length]);
-            } 
-            else if (new Date(d.time).getTime() !== cData[cData.length - 1][0].getTime()) {
-              cData.push([new Date(d.time), d.usr.length]);
+            if (i === 0 || new Date(d.time).getTime() !== cData[cData.length - 1][0].getTime()) {
+              var userNum = 0;
+              Object.keys(d.usr).forEach((key) => {
+                userNum += d.usr[key].length;
+              });
+              cData.push([new Date(d.time), userNum]);
             } 
             else {
-              cData[cData.length - 1][1] = d.usr.length;
+              var userNum = 0;
+              Object.keys(d.usr).forEach((key) => {
+                userNum += d.usr[key].length;
+              });
+              cData[cData.length - 1][1] = userNum;
             }
           });
           this.setState({
