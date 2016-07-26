@@ -20,56 +20,25 @@ class StackedChart extends Component {
       + ('0' + (date.getMonth()+1)).slice(-2)
       + ('0' + date.getDate()).slice(-2);
     //fetch(`/api/${sDate}`)
-    fetch(`/api/20160420`)
+    fetch(`/api/20160601`)
       .then(res => res.json())
       .then(data => {
         let scData = [];
-        const agents = ['CSB-i', 'CSB-A', 'CSB-w', 'CDt', 'LoginApp for Windows', 'Mac', 'Others'];
-        //function checkNewAgent(d, dPrev, noNewAgent) {
-          //if ( !noNewAgent ) {
-            //scData.forEach((cd) => {
-              //cd.push(0);
-            //});
-            //scData[scData.length - 1][scData[scData.length - 1].length - 1] = d.usr.length - dPrev.usr.length;
-            //agents.push(d.agent);
-          //}
-        //}
+        const agents = ['CSB-i', 'CSB-A', 'CSB-W', 'CDt', 'LoginApp', 'Mac', 'Others'];
 
         data.forEach((d, i) => {
-          if (i === 0) {
+          if (i === 0 ||
+            new Date(d.time).getTime() !== scData[scData.length - 1][0].getTime()) {
             scData.push(new Array(agents.length + 1));
             scData[scData.length - 1][0] = new Date(d.time);
             agents.forEach((a, ia) => {
-              if (d.agent === a) {
-                scData[scData.length - 1][ia + 1] = d.usr.length;
-              } else {
-                scData[scData.length - 1][ia + 1] = 0;
-              }
+              scData[scData.length - 1][ia + 1] = d.usr[a].length;
             });
-            //scData.push([new Date(d.time), d.usr.length]);
-            //agents.push(d.agent);
-          } else if (new Date(d.time).getTime() !== scData[scData.length - 1][0].getTime()) {
-            //let noNewAgent = false;
-            scData.push(new Array(agents.length + 1));
-            scData[scData.length - 1][0] = new Date(d.time);
-            agents.forEach((a, ia) => {
-              scData[scData.length - 1][ia + 1] = scData[scData.length - 2][ia + 1];
-              if (d.agent === a) {
-                scData[scData.length - 1][ia + 1] += d.usr.length - data[i - 1].usr.length; // new users + users' num of previous time
-                //noNewAgent = true;
-              }
-            });
-            //checkNewAgent(d, data[i - 1], noNewAgent);
           } 
           else {
-            //let noNewAgent = false;
             agents.forEach((a, ia) => {
-              if (d.agent === a) {
-                scData[scData.length - 1][ia + 1] += d.usr.length - data[i - 1].usr.length;
-                //noNewAgent = true;
-              }
+              scData[scData.length - 1][ia + 1] = d.usr[a].length;
             });
-            //checkNewAgent(d, data[i - 1], noNewAgent);
           }
         });
         this.setState({

@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const fs = require('fs');
+const async = require('async');
 const logDir = `${__dirname}/../logFiles`;
 const DBDir = `${__dirname}/../db`
 
 var obj = {};
+
+//obj['agent'] = 'CSB-i';
+//obj['usr'][obj['agent']].push('x');
+//console.log(obj);
 fs.readdir(logDir, (err, files) => {
   files.forEach ((logFile, i) => {
     fs.readFile(`${logDir}/${logFile}`, 'utf-8', (err, data) => {
@@ -12,26 +17,46 @@ fs.readdir(logDir, (err, files) => {
         fs.createWriteStream(DB_PATH, {fd: fs.openSync(DB_PATH, 'w'), flags: 'w'}).write('[');
         var sep = "";
         const fileArray = data.split('\n');
-        fileArray.forEach((fa, ii) => {
+        fileArray.forEach((fa) => {
           if (fa.length !== 0) {
             const faa = fa.split(',');
             const eventId = faa[1];
             const messageString = faa[5];
+            var agent;
+            
+            //if (logFile.indexOf('EVENTS_') !== -1) {
+              //console.log(agent);
+            if (faa[3].indexOf('Cachatto%2F') !== -1 || faa[3].indexOf('Cachatto-ipad/') !== -1) {
+              agent = 'CSB-i';
+            } else if (faa[3].indexOf('Cachatto-Android') !== -1) {
+              agent = 'CSB-A';
+            } else if (faa[3].indexOf('Cachatto-Agent') !== -1) {
+              agent = 'CSB-W';
+            } else if (faa[3].indexOf('CACHATTO%20Desktop%2F') !== -1) {
+              agent = 'CDt';
+            } else if (faa[3].indexOf('CachattoLoginApp%2F') !== -1) {
+              agent = 'LoginApp';
+            } else if (faa[3].indexOf('Cachatto-Mac%2F') !== -1) {
+              agent = 'Mac';
+            } else {
+              agent = 'Others';
+            };
+
             if (Object.getOwnPropertyNames(obj).length === 0) {
+              obj['usr'] = {'CSB-i':[], 'CSB-A':[], 'CSB-W':[], 'CDt':[], 'LoginApp':[], 'Mac':[], 'Others':[]};
               if (eventId === '10' && messageString.indexOf('successful') !== -1) {
-                obj['usr'] = [faa[0]];
-              } else {
-                obj['usr'] = [];
+                obj['usr'][agent].push(faa[0]);
               }
             } 
             else {
               if (eventId === '10' && messageString.indexOf('successful') !== -1) {
-                obj['usr'].push(faa[0]);
-              } 
-              else if (eventId === '85') {
-                const iusr = obj['usr'].indexOf(faa[0]);
+                if (obj['usr'][agent].indexOf(faa[0]) === -1) {
+                  obj['usr'][agent].push(faa[0]);
+                }
+              } else if (eventId === '85') {
+                const iusr = obj['usr'][agent].indexOf(faa[0]);
                 if ( iusr !== -1) {
-                  obj['usr'].splice(iusr, 1);
+                  obj['usr'][agent].splice(iusr, 1);
                 } else {
                   return;
                 }
@@ -44,21 +69,6 @@ fs.readdir(logDir, (err, files) => {
             obj['time'] = faa[2];
             obj['messageId'] = faa[4];
 
-            if (faa[3].indexOf('Cachatto%2F') !== -1 || faa[3].indexOf('Cachatto-ipad/') !== -1) {
-              obj['agent'] = 'CSB-i';
-            } else if (faa[3].indexOf('Cachatto-Android') !== -1) {
-              obj['agent'] = 'CSB-A';
-            } else if (faa[3].indexOf('Cachatto-Agent') !== -1) {
-              obj['agent'] = 'CSB-W';
-            } else if (faa[3].indexOf('CACHATTO Desktop%2F') !== -1) {
-              obj['agent'] = 'CDt';
-            } else if (faa[3].indexOf('CachattoLoginApp%2F') !== -1) {
-              obj['agent'] = 'LoginApp for Windows';
-            } else if (faa[3].indexOf('Cachatto-Mac%2F') !== -1) {
-              obj['agent'] = 'Mac';
-            } else {
-              obj['agent'] = 'Others';
-            }
             const writeStream = fs.createWriteStream(DB_PATH, {fd: fs.openSync(DB_PATH, 'a'), flags: 'r+'});
             writeStream.write(sep + JSON.stringify(obj));
             if (!sep) {
@@ -73,7 +83,7 @@ fs.readdir(logDir, (err, files) => {
 
 
 
-/* GET home page. */
+//[> GET home page. <]
 router.get('/:date', function(req, res, next) {
   try {
     const stats1 = fs.lstatSync(`${DBDir}/EVENTS_${req.params.date}.json`);
@@ -118,9 +128,23 @@ router.get('/:date', function(req, res, next) {
   }
 });
 
-//router.get('/:month', function(req, res, next) {
-  
+//router.get('/:year/:month', function(req, res, next) {
+  //fs.readdir(DBDir, (err, files) => {
+    //var jdata = [];
+    //const monthFiles = [];
+    //files.forEach((dbfile) => {
+      //if(dbfile.indexOf(`${req.params.year}${req.params.month}`) !== -1) {
+        //monthFiles.push(dbfile);
+      //}
+    //});
+    //function readCallback(err, data) {};
 
-
+    //function readAsync(file, readCallback) {
+      //fs.readFile(`${DBDir}/${file}`, 'utf-8', readCallback);
+    //};
+    //async.map(monthFiles, readAsync, (err, result) => {
+      //return res.json(JSON.parse(JSON.stringify(result)));
+    //})
+  //});
 //})
 module.exports = router;
