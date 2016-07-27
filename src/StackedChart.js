@@ -18,10 +18,10 @@ class StackedChart extends Component {
   handleClickDay() {
     const date = new Date();
     const sDate = date.getFullYear() 
-      + ('0' + (date.getMonth()+1)).slice(-2)
-      + ('0' + date.getDate()).slice(-2);
+      + ('/0' + (date.getMonth()+1)).slice(-2)
+      + ('/0' + date.getDate()).slice(-2);
     //fetch(`/api/${sDate}`)
-    fetch(`/api/20160601`)
+    fetch(`/api/2016/06/01`)
       .then(res => res.json())
       .then(data => {
         let scData = [];

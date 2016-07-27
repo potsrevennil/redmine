@@ -84,22 +84,23 @@ fs.readdir(logDir, (err, files) => {
 
 
 //[> GET home page. <]
-router.get('/:date', function(req, res, next) {
+router.get('/:year/:month/:date', function(req, res, next) {
   try {
-    const stats1 = fs.lstatSync(`${DBDir}/EVENTS_${req.params.date}.json`);
+    const date = `${req.params.year}${req.params.month}${req.params.date}`;
+    const stats1 = fs.lstatSync(`${DBDir}/EVENTS_${date}.json`);
     if (stats1.isFile()) {
-      fs.readFile(`${DBDir}/EVENTS_${req.params.date}.json`, 'utf-8', (err1, data1) => {
-        const date = req.params.date;
-        const today = new Date(`${date.substr(0, 4)}/${date.substr(4, 2)}/${date.substr(6, 2)}`);
+      fs.readFile(`${DBDir}/EVENTS_${date}.json`, 'utf-8', (err1, data1) => {
+        const today = new Date(`${req.params.year}/${req.params.month}/${req.params.date}`);
         const yesterday = new Date(today.setDate(today.getDate() - 1));
+        // convert the date of yesterday to => ex: 20160727
         const yDate = yesterday.getFullYear() 
           + ('0' + (yesterday.getMonth()+1)).slice(-2)
           + ('0' + yesterday.getDate()).slice(-2);
+
         try {
           const stats2 = fs.lstatSync(`${DBDir}/EVENTS_${yDate}.json`);
           if (stats2.isFile()) {
             fs.readFile(`${DBDir}/EVENTS_${yDate}.json`, 'utf-8', (err2, data2) => {
-            
               if (err2 || err1) {
                 return next(err2);
               }
