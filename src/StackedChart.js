@@ -11,7 +11,7 @@ class StackedChart extends Component {
     };
     this.handleClickDay = this.handleClickDay.bind(this);
     this.handleClickMonth = this.handleClickMonth.bind(this);
-
+    this.handleClickYear = this.handleClickYear.bind(this);
   }
 
 
@@ -82,6 +82,38 @@ class StackedChart extends Component {
       });
   }
 
+  handleClickYear() {
+    const date = new Date();
+    const sDate = date.getFullYear(); 
+    //fetch(`/api/${sDate}`)
+    fetch(`/api/2016`)
+      .then(res => res.json())
+      .then(data => {
+        let scData = [];
+        const agents = ['CSB-i', 'CSB-A', 'CSB-W', 'CDt', 'LoginApp', 'Mac', 'Others'];
+
+        data.forEach((d, i) => {
+          if (i === 0 ||
+            new Date(d.time).getTime() !== scData[scData.length - 1][0].getTime()) {
+            scData.push(new Array(agents.length + 1));
+            scData[scData.length - 1][0] = new Date(d.time);
+            agents.forEach((a, ia) => {
+              scData[scData.length - 1][ia + 1] = d.usr[a].length;
+            });
+          } 
+          else {
+            agents.forEach((a, ia) => {
+              scData[scData.length - 1][ia + 1] = d.usr[a].length;
+            });
+          }
+        });
+        this.setState({
+          data: scData,
+          agents: agents
+        });
+      });
+  }
+
   render() {
     const data = this.state.data;
     const agents = this.state.agents;
@@ -112,6 +144,7 @@ class StackedChart extends Component {
           />
         <button style={{width:'120px', height:'60px'}} onClick={this.handleClickDay}>Day</button>
         <button style={{width:'120px', height:'60px'}} onClick={this.handleClickMonth}>Month</button>
+        <button style={{width:'120px', height:'60px'}} onClick={this.handleClickYear}>Year</button>
       </div>
     );
   
