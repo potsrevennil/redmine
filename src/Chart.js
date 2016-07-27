@@ -12,6 +12,36 @@ class Chart extends Component {
     this.handleClickDay = this.handleClickDay.bind(this);
     this.handleClickMonth = this.handleClickMonth.bind(this);
     this.handleClickYear = this.handleClickYear.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(sDate) {
+    fetch(`/api/${sDate}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.length !== 0 ) {
+          let cData = [];
+          data.forEach((d, i) => {
+            if (i === 0 || new Date(d.time).getTime() !== cData[cData.length - 1][0].getTime()) {
+              var userNum = 0;
+              Object.keys(d.usr).forEach((key) => {
+                userNum += d.usr[key].length;
+              });
+              cData.push([new Date(d.time), userNum]);
+            } 
+            else {
+              var userNum = 0;
+              Object.keys(d.usr).forEach((key) => {
+                userNum += d.usr[key].length;
+              });
+              cData[cData.length - 1][1] = userNum;
+            }
+          });
+          this.setState({
+            data: cData
+          });
+        }
+      });
   }
 
   handleClickDay() {
@@ -19,99 +49,22 @@ class Chart extends Component {
     const sDate = date.getFullYear() 
       + ('/0' + (date.getMonth()+1)).slice(-2)
       + ('/0' + date.getDate()).slice(-2);
-    //fetch(`/api/${sDate}`)
-    fetch(`/api/2016/06/01`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.length !== 0 ) {
-          let cData = [];
-          data.forEach((d, i) => {
-            if (i === 0 || new Date(d.time).getTime() !== cData[cData.length - 1][0].getTime()) {
-              var userNum = 0;
-              Object.keys(d.usr).forEach((key) => {
-                userNum += d.usr[key].length;
-              });
-              cData.push([new Date(d.time), userNum]);
-            } 
-            else {
-              var userNum = 0;
-              Object.keys(d.usr).forEach((key) => {
-                userNum += d.usr[key].length;
-              });
-              cData[cData.length - 1][1] = userNum;
-            }
-          });
-          this.setState({
-            data: cData
-          });
-        }
-      });
+    this.handleClick('2016/06/01');
   }
 
   handleClickMonth() {
     const date = new Date();
     const sMonth = date.getFullYear()
       + ('0' + (date.getMonth()+1)).slice(-2);
-    //fetch(`/api/${sMonth}`)
-    fetch('/api/2016/05')
-      .then(res => res.json())
-      .then(data => {
-        if (data.length !== 0 ) {
-          let cData = [];
-          data.forEach((d, i) => {
-            if (i === 0 || new Date(d.time).getTime() !== cData[cData.length - 1][0].getTime()) {
-              var userNum = 0;
-              Object.keys(d.usr).forEach((key) => {
-                userNum += d.usr[key].length;
-              });
-              cData.push([new Date(d.time), userNum]);
-            } 
-            else {
-              var userNum = 0;
-              Object.keys(d.usr).forEach((key) => {
-                userNum += d.usr[key].length;
-              });
-              cData[cData.length - 1][1] = userNum;
-            }
-          });
-          this.setState({
-            data: cData
-          });
-        }
-      });
+    this.handleClick(sMonth);
   }
 
   handleClickYear() {
     const date = new Date();
     const sDate = date.getFullYear(); 
-    //fetch(`/api/${sDate}`)
-    fetch(`/api/2016`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.length !== 0 ) {
-          let cData = [];
-          data.forEach((d, i) => {
-            if (i === 0 || new Date(d.time).getTime() !== cData[cData.length - 1][0].getTime()) {
-              var userNum = 0;
-              Object.keys(d.usr).forEach((key) => {
-                userNum += d.usr[key].length;
-              });
-              cData.push([new Date(d.time), userNum]);
-            } 
-            else {
-              var userNum = 0;
-              Object.keys(d.usr).forEach((key) => {
-                userNum += d.usr[key].length;
-              });
-              cData[cData.length - 1][1] = userNum;
-            }
-          });
-          this.setState({
-            data: cData
-          });
-        }
-      });
+    this.handleClick(sDate);
   }
+
   render() {
     const data = this.state.data;
     return (

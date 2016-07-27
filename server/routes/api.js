@@ -129,12 +129,35 @@ router.get('/:year/:month/:date', function(req, res, next) {
   }
 });
 
-router.get('/:year/:month', function(req, res, next) {
+//router.get('/:year/:month', function(req, res, next) {
+  //fs.readdir(DBDir, (err, files) => {
+    //const monthFiles = [];
+    //files.forEach((dbfile) => {
+      //if(dbfile.indexOf(`${req.params.year}${req.params.month}`) !== -1) {
+        //monthFiles.push(dbfile);
+      //}
+    //});
+    //function readCallback(err, data) {};
+
+    //function readAsync(file, readCallback) {
+      //fs.readFile(`${DBDir}/${file}`, 'utf-8', readCallback);
+    //};
+    //async.map(monthFiles, readAsync, (err, result) => {
+      //var jdata = [];
+      //async.each(result, (r) => {
+        //jdata = jdata.concat(JSON.parse(r));
+      //}, (err) => {});
+      //return res.json(jdata);
+    //})
+  //});
+//})
+
+router.get('/:date', function(req, res, next) {
   fs.readdir(DBDir, (err, files) => {
-    const monthFiles = [];
+    const dateFiles = [];
     files.forEach((dbfile) => {
-      if(dbfile.indexOf(`${req.params.year}${req.params.month}`) !== -1) {
-        monthFiles.push(dbfile);
+      if(dbfile.indexOf(`_${req.params.date}`) !== -1) {
+        dateFiles.push(dbfile);
       }
     });
     function readCallback(err, data) {};
@@ -142,30 +165,7 @@ router.get('/:year/:month', function(req, res, next) {
     function readAsync(file, readCallback) {
       fs.readFile(`${DBDir}/${file}`, 'utf-8', readCallback);
     };
-    async.map(monthFiles, readAsync, (err, result) => {
-      var jdata = [];
-      async.each(result, (r) => {
-        jdata = jdata.concat(JSON.parse(r));
-      }, (err) => {});
-      return res.json(jdata);
-    })
-  });
-})
-
-router.get('/:year', function(req, res, next) {
-  fs.readdir(DBDir, (err, files) => {
-    const yearFiles = [];
-    files.forEach((dbfile) => {
-      if(dbfile.indexOf(`_${req.params.year}`) !== -1) {
-        yearFiles.push(dbfile);
-      }
-    });
-    function readCallback(err, data) {};
-
-    function readAsync(file, readCallback) {
-      fs.readFile(`${DBDir}/${file}`, 'utf-8', readCallback);
-    };
-    async.map(yearFiles, readAsync, (err, result) => {
+    async.map(dateFiles, readAsync, (err, result) => {
       var jdata = [];
       async.each(result, (r) => {
         jdata = jdata.concat(JSON.parse(r));
