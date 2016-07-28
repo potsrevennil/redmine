@@ -81,77 +81,6 @@ fs.readdir(logDir, (err, files) => {
   });
 });
 
-
-
-//[> GET home page. <]
-//router.get('/:year/:month/:date', function(req, res, next) {
-  //try {
-    //const date = `${req.params.year}${req.params.month}${req.params.date}`;
-    //const stats1 = fs.lstatSync(`${DBDir}/EVENTS_${date}.json`);
-    //if (stats1.isFile()) {
-      //fs.readFile(`${DBDir}/EVENTS_${date}.json`, 'utf-8', (err1, data1) => {
-        //const today = new Date(`${req.params.year}/${req.params.month}/${req.params.date}`);
-        //const yesterday = new Date(today.setDate(today.getDate() - 1));
-        //// convert the date of yesterday to => ex: 20160727
-        //const yDate = yesterday.getFullYear() 
-          //+ ('0' + (yesterday.getMonth()+1)).slice(-2)
-          //+ ('0' + yesterday.getDate()).slice(-2);
-
-        //try {
-          //const stats2 = fs.lstatSync(`${DBDir}/EVENTS_${yDate}.json`);
-          //if (stats2.isFile()) {
-            //fs.readFile(`${DBDir}/EVENTS_${yDate}.json`, 'utf-8', (err2, data2) => {
-              //if (err2 || err1) {
-                //return next(err2);
-              //}
-              //try {
-                //const jdata = JSON.parse(data2).concat(JSON.parse(data1));
-                //return res.json(jdata);
-              //} catch (errr2) {
-                //return next(errr2);
-              //}
-            //})
-          //}
-        //} catch(e2) {
-          //if (err1) {
-            //return next(err1);
-          //}
-          //try {
-            //return res.json(JSON.parse(data1));
-          //} catch (errr1) {
-            //return next(errr1);
-          //}
-        //}
-      //});
-    //}
-  //} catch (e1) {
-    //return;
-  //}
-//});
-
-//router.get('/:year/:month', function(req, res, next) {
-  //fs.readdir(DBDir, (err, files) => {
-    //const monthFiles = [];
-    //files.forEach((dbfile) => {
-      //if(dbfile.indexOf(`${req.params.year}${req.params.month}`) !== -1) {
-        //monthFiles.push(dbfile);
-      //}
-    //});
-    //function readCallback(err, data) {};
-
-    //function readAsync(file, readCallback) {
-      //fs.readFile(`${DBDir}/${file}`, 'utf-8', readCallback);
-    //};
-    //async.map(monthFiles, readAsync, (err, result) => {
-      //var jdata = [];
-      //async.each(result, (r) => {
-        //jdata = jdata.concat(JSON.parse(r));
-      //}, (err) => {});
-      //return res.json(jdata);
-    //})
-  //});
-//})
-
 router.get('/:date', function(req, res, next) {
   fs.readdir(DBDir, (err, files) => {
     const dateFiles = [];
@@ -162,7 +91,7 @@ router.get('/:date', function(req, res, next) {
     });
     // if only one file, then show the data of previous day also
     if (dateFiles.length === 1) {
-      const today = new Date(`${dataFiles[0].substring(7, 4)}/${dataFiles[0].substring(11, 2)}/${dataFiles.substring(13, 2)}`);
+      const today = new Date(`${dateFiles[0].substring(7, 11)}/${dateFiles[0].substring(11, 13)}/${dateFiles[0].substring(13, 15)}`);
       const yesterday = new Date(today.setDate(today.getDate() - 1));
       // convert the date of yesterday to => ex: 20160727
       const yDate = yesterday.getFullYear() 
@@ -172,12 +101,10 @@ router.get('/:date', function(req, res, next) {
         try {
           const stats = fs.lstatSync(`${DBDir}/EVENTS_${yDate}.json`);
           if (stats.isFile()) {
-           dataFiles.push(`${DBDir}/EVENTS_${yDate}.json`); 
+            dateFiles.splice(0, 0, `EVENTS_${yDate}.json`); 
           }
         } catch (e) {};
     }
-
-
 
     function readCallback(err, data) {};
 

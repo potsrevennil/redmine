@@ -47,9 +47,9 @@ class Chart extends Component {
   handleClickDay() {
     const date = new Date();
     const sDate = date.getFullYear() 
-      + ('/0' + (date.getMonth()+1)).slice(-2)
-      + ('/0' + date.getDate()).slice(-2);
-    this.handleClick('20160601');
+      + ('0' + (date.getMonth()+1)).slice(-2)
+      + ('0' + date.getDate()).slice(-2);
+    this.handleClick('20160419');
   }
 
   handleClickMonth() {
