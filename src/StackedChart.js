@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import fetch from 'isomorphic-fetch';
 import dygraph from 'dygraphs';
+import async from 'async';
 
 class StackedChart extends Component {
   constructor() {
@@ -19,32 +20,70 @@ class StackedChart extends Component {
   }
 
   handleClick(sDate) {
+    const agents = ['CSB-i', 'CSB-A', 'CSB-W', 'CDt', 'LoginApp', 'Mac', 'Others'];
+    var concatData = [];
     fetch(`/api/${sDate}`)
       .then(res => res.json())
-      .then(data => {
-        let scData = [];
-        const agents = ['CSB-i', 'CSB-A', 'CSB-W', 'CDt', 'LoginApp', 'Mac', 'Others'];
+      .then(files => {
+        async.map(files, function(item, callback) {
+          fetch(`/api/file/${item}`)
+            .then(res => res.json())
+            .then(data => {
+              let scData = [];
 
-        data.forEach((d, i) => {
-          if (i === 0 ||
-            new Date(d.time).getTime() !== scData[scData.length - 1][0].getTime()) {
-            scData.push(new Array(agents.length + 1));
-            scData[scData.length - 1][0] = new Date(d.time);
-            agents.forEach((a, ia) => {
-              scData[scData.length - 1][ia + 1] = d.usr[a].length;
+              data.forEach((d, i) => {
+                if (i === 0 ||
+                  new Date(d.time).getTime() !== scData[scData.length - 1][0].getTime()) {
+                  scData.push(new Array(agents.length + 1));
+                  scData[scData.length - 1][0] = new Date(d.time);
+                  agents.forEach((a, ia) => {
+                    scData[scData.length - 1][ia + 1] = d.usr[a].length;
+                  });
+                } 
+                else {
+                  agents.forEach((a, ia) => {
+                    scData[scData.length - 1][ia + 1] = d.usr[a].length;
+                  });
+                }
+              });
+              callback(null, scData);
             });
-          } 
-          else {
-            agents.forEach((a, ia) => {
-              scData[scData.length - 1][ia + 1] = d.usr[a].length;
-            });
-          }
-        });
-        this.setState({
-          data: scData,
-          agents: agents
-        });
+        }, function(err, result) {
+          async.each(result, (r) => {
+            concatData = concatData.concat(r);
+          }, (err) => {});
+          this.setState({
+            data: concatData,
+            agents: agents
+          })
+        }.bind(this));
       });
+    //fetch(`/api/${sDate}`)
+      //.then(res => res.json())
+      //.then(data => {
+        //let scData = [];
+        //const agents = ['CSB-i', 'CSB-A', 'CSB-W', 'CDt', 'LoginApp', 'Mac', 'Others'];
+
+        //data.forEach((d, i) => {
+          //if (i === 0 ||
+            //new Date(d.time).getTime() !== scData[scData.length - 1][0].getTime()) {
+            //scData.push(new Array(agents.length + 1));
+            //scData[scData.length - 1][0] = new Date(d.time);
+            //agents.forEach((a, ia) => {
+              //scData[scData.length - 1][ia + 1] = d.usr[a].length;
+            //});
+          //} 
+          //else {
+            //agents.forEach((a, ia) => {
+              //scData[scData.length - 1][ia + 1] = d.usr[a].length;
+            //});
+          //}
+        //});
+        //this.setState({
+          //data: scData,
+          //agents: agents
+        //});
+      //});
   }
 
   handleClickDay() {
@@ -53,7 +92,7 @@ class StackedChart extends Component {
       + ('0' + (date.getMonth()+1)).slice(-2)
       + ('0' + date.getDate()).slice(-2);
     //this.handleClick(sDate);
-    this.handleClick('20160501');
+    this.handleClick('20160719');
   }
 
   handleClickMonth() {
@@ -68,6 +107,7 @@ class StackedChart extends Component {
     const date = new Date();
     const sDate = date.getFullYear(); 
     this.handleClick(sDate);
+
   }
 
   handleChange(event) {

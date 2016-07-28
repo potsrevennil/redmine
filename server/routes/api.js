@@ -67,7 +67,6 @@ fs.readdir(logDir, (err, files) => {
             }
             
             obj['time'] = faa[2];
-            obj['messageId'] = faa[4];
 
             const writeStream = fs.createWriteStream(DB_PATH, {fd: fs.openSync(DB_PATH, 'a'), flags: 'r+'});
             writeStream.write(sep + JSON.stringify(obj));
@@ -89,35 +88,45 @@ router.get('/:date', function(req, res, next) {
         dateFiles.push(dbfile);
       }
     });
+
+    return res.json(JSON.parse(JSON.stringify(dateFiles)));
     // if only one file, then show the data of previous day also
-    if (dateFiles.length === 1) {
-      const today = new Date(`${dateFiles[0].substring(7, 11)}/${dateFiles[0].substring(11, 13)}/${dateFiles[0].substring(13, 15)}`);
-      const yesterday = new Date(today.setDate(today.getDate() - 1));
-      // convert the date of yesterday to => ex: 20160727
-      const yDate = yesterday.getFullYear() 
-        + ('0' + (yesterday.getMonth()+1)).slice(-2)
-        + ('0' + yesterday.getDate()).slice(-2);
+    //if (dateFiles.length === 1) {
+      //const today = new Date(`${dateFiles[0].substring(7, 11)}/${dateFiles[0].substring(11, 13)}/${dateFiles[0].substring(13, 15)}`);
+      //const yesterday = new Date(today.setDate(today.getDate() - 1));
+      //// convert the date of yesterday to => ex: 20160727
+      //const yDate = yesterday.getFullYear() 
+        //+ ('0' + (yesterday.getMonth()+1)).slice(-2)
+        //+ ('0' + yesterday.getDate()).slice(-2);
       
-        try {
-          const stats = fs.lstatSync(`${DBDir}/EVENTS_${yDate}.json`);
-          if (stats.isFile()) {
-            dateFiles.splice(0, 0, `EVENTS_${yDate}.json`); 
-          }
-        } catch (e) {};
-    }
+        //try {
+          //const stats = fs.lstatSync(`${DBDir}/EVENTS_${yDate}.json`);
+          //if (stats.isFile()) {
+            //dateFiles.splice(0, 0, `EVENTS_${yDate}.json`); 
+          //}
+        //} catch (e) {};
+    //}
 
-    function readCallback(err, data) {};
+    //function readCallback(err, data) {};
 
-    function readAsync(file, readCallback) {
-      fs.readFile(`${DBDir}/${file}`, 'utf-8', readCallback);
-    };
-    async.map(dateFiles, readAsync, (err, result) => {
-      var jdata = [];
-      async.each(result, (r) => {
-        jdata = jdata.concat(JSON.parse(r));
-      }, (err) => {});
-      return res.json(jdata);
-    })
+    //function readAsync(file, readCallback) {
+      //fs.readFile(`${DBDir}/${file}`, 'utf-8', readCallback);
+    //};
+    //async.map(dateFiles, readAsync, (err, result) => {
+      //var jdata = [];
+      //async.each(result, (r) => {
+        //jdata = jdata.concat(JSON.parse(r));
+      //}, (err) => {});
+      //return res.json(jdata);
+    //});
+    
   });
 })
+
+  router.get('/file/:fileName', function(req, res, next) {
+    fs.readFile(`${DBDir}/${req.params.fileName}`, 'utf-8', (err, data) => {
+      return res.json(JSON.parse(data));
+    })
+
+  });
 module.exports = router;
