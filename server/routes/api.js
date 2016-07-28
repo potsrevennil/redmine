@@ -5,7 +5,7 @@ const async = require('async');
 const logDir = `${__dirname}/../logFiles`;
 const DBDir = `${__dirname}/../db`
 
-var obj = {};
+var obj = [];
 var usr = {'CSB-i':[], 'CSB-A':[], 'CSB-W':[], 'CDt':[], 'LoginApp':[], 'Mac':[], 'Others':[]};
 
 //obj['agent'] = 'CSB-i';
@@ -42,25 +42,37 @@ fs.readdir(logDir, (err, files) => {
             } else {
               agent = 'Others';
             };
-
-            if (Object.getOwnPropertyNames(obj).length === 0) {
-              obj['usr'] = {'CSB-i':0, 'CSB-A':0, 'CSB-W':0, 'CDt':0, 'LoginApp':0, 'Mac':0, 'Others':0};
+            if (obj.length === 0) {
+              obj = [faa[2], 0, 0, 0, 0, 0, 0, 0];
               if (eventId === '10' && messageString.indexOf('successful') !== -1) {
                 usr[agent].push(faa[0]);
-                obj['usr'][agent] = usr[agent].length;
+                Object.keys(usr).forEach((key, i) => {
+                  if (key === agent) {
+                    obj[i + 1] = usr[agent].length;
+                  }
+                });
               }
             } 
             else {
+              obj[0] = faa[2];
               if (eventId === '10' && messageString.indexOf('successful') !== -1) {
                 if (usr[agent].indexOf(faa[0]) === -1) {
                   usr[agent].push(faa[0]);
-                  obj['usr'][agent] = usr[agent].length;
+                  Object.keys(usr).forEach((key, i) => {
+                    if (key === agent) {
+                      obj[i + 1] = usr[agent].length;
+                    }
+                  });
                 }
               } else if (eventId === '85') {
                 const iusr = usr[agent].indexOf(faa[0]);
                 if ( iusr !== -1) {
                   usr[agent].splice(iusr, 1);
-                  obj['usr'][agent] = usr[agent].length;
+                  Object.keys(usr).forEach((key, i) => {
+                    if (key === agent) {
+                      obj[i + 1] = usr[agent].length;
+                    }
+                  });
                 } else {
                   return;
                 }
@@ -70,7 +82,7 @@ fs.readdir(logDir, (err, files) => {
               }
             }
             
-            obj['time'] = faa[2];
+            //obj['time'] = faa[2];
 
             const writeStream = fs.createWriteStream(DB_PATH, {fd: fs.openSync(DB_PATH, 'a'), flags: 'r+'});
             writeStream.write(sep + JSON.stringify(obj));

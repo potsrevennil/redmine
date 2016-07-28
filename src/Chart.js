@@ -9,11 +9,14 @@ class Chart extends Component {
     super();
     this.state = {
       data: [[new Date(0), 0]],
+      value: ''
     };
     this.handleClickDay = this.handleClickDay.bind(this);
     this.handleClickMonth = this.handleClickMonth.bind(this);
     this.handleClickYear = this.handleClickYear.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleClick(sDate) {
@@ -25,27 +28,23 @@ class Chart extends Component {
           fetch(`/api/file/${item}`)
             .then(res => res.json())
             .then(data => {
-              console.log(data);
-              if (data.length !== 0 ) {
-                let cData = [];
-                data.forEach((d, i) => {
-                  if (i === 0 || new Date(d.time).getTime() !== cData[cData.length - 1][0].getTime()) {
-                    var userNum = 0;
-                    Object.keys(d.usr).forEach((key) => {
-                      userNum += d.usr[key];
-                    });
-                    cData.push([new Date(d.time), userNum]);
-                  } 
-                  else {
-                    var userNum = 0;
-                    Object.keys(d.usr).forEach((key) => {
-                      userNum += d.usr[key];
-                    });
-                    cData[cData.length - 1][1] = userNum;
+              var cData = [];
+              data.forEach((d, i) => {
+                var usrNum = 0;
+                d.forEach((ud, ui) => {
+                  if (ui !== 0) {
+                    usrNum += ud;
                   }
-                });
-                callback(null, cData);
-              }
+                })
+                cData.push([new Date(d[0]), usrNum]);
+                console.log(cData);
+                if (i !== 0) {
+                  if (cData[cData.length - 2][0].getTime() === cData[cData.length - 1][0].getTime()) {
+                    cData.splice(cData.length - 2, 1);
+                  }
+                }
+              })
+              callback(null, cData);
             });
         }, function(err, result) {
           async.each(result, (r) => {
@@ -79,8 +78,20 @@ class Chart extends Component {
     this.handleClick(sDate);
   }
 
+  handleChange(event) {
+    this.setState({value: event.target.value});
+  }
+
+  handleSubmit(event) {
+    if (event.keyCode === 13) {
+      this.handleClick(event.target.value);
+      this.setState({value: ''});
+    }
+  }
+
   render() {
     const data = this.state.data;
+    const value = this.state.value;
     return (
       <div>
         <div
@@ -101,9 +112,20 @@ class Chart extends Component {
             );
           }}
         />
-        <button style={{width:'120px', height:'60px'}} onClick={this.handleClickDay}>Day</button>
-        <button style={{width:'120px', height:'60px'}} onClick={this.handleClickMonth}>Month</button>
-        <button style={{width:'120px', height:'60px'}} onClick={this.handleClickYear}>Year</button>
+        <div>
+          <button style={{width:'120px', height:'60px'}} onClick={this.handleClickDay}>Day</button>
+          <button style={{width:'120px', height:'60px'}} onClick={this.handleClickMonth}>Month</button>
+          <button style={{width:'120px', height:'60px'}} onClick={this.handleClickYear}>Year</button>
+        </div>
+        <div style={{position: 'relative', top: '20px'}}>
+          <input
+            style={{height: 50, width: 600, fontSize: '35px'}}
+            value= {value}
+            placeholder='What date do you want to search ?'
+            onChange={this.handleChange}
+            onKeyDown={this.handleSubmit}
+          />
+        </div>
       </div>
     );
   }

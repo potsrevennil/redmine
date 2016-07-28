@@ -29,24 +29,19 @@ class StackedChart extends Component {
           fetch(`/api/file/${item}`)
             .then(res => res.json())
             .then(data => {
-              let scData = [];
-
+              var spliceIndex = [];
               data.forEach((d, i) => {
-                if (i === 0 ||
-                  new Date(d.time).getTime() !== scData[scData.length - 1][0].getTime()) {
-                  scData.push(new Array(agents.length + 1));
-                  scData[scData.length - 1][0] = new Date(d.time);
-                  agents.forEach((a, ia) => {
-                    scData[scData.length - 1][ia + 1] = d.usr[a];
-                  });
-                } 
-                else {
-                  agents.forEach((a, ia) => {
-                    scData[scData.length - 1][ia + 1] = d.usr[a];
-                  });
+                d[0] = new Date(d[0]);
+                if (i !== 0) {
+                  if (d[0].getTime() === data[i - 1][0].getTime()) {
+                    spliceIndex.push(i - 1);
+                  }
                 }
-              });
-              callback(null, scData);
+              })
+              spliceIndex.forEach((s) => {
+                data.splice(s, 1);
+              })
+              callback(null, data);
             });
         }, function(err, result) {
           async.each(result, (r) => {
