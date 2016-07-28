@@ -49,7 +49,7 @@ class Chart extends Component {
     const sDate = date.getFullYear() 
       + ('/0' + (date.getMonth()+1)).slice(-2)
       + ('/0' + date.getDate()).slice(-2);
-    this.handleClick('2016/06/01');
+    this.handleClick('20160601');
   }
 
   handleClickMonth() {
