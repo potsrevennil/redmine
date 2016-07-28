@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import fetch from 'isomorphic-fetch';
 import dygraph from 'dygraphs';
+import async from 'async';
 
 
 class Chart extends Component {
@@ -16,33 +17,46 @@ class Chart extends Component {
   }
 
   handleClick(sDate) {
+    var concatData = [];
     fetch(`/api/${sDate}`)
       .then(res => res.json())
-      .then(data => {
-        if (data.length !== 0 ) {
-          let cData = [];
-          data.forEach((d, i) => {
-            if (i === 0 || new Date(d.time).getTime() !== cData[cData.length - 1][0].getTime()) {
-              var userNum = 0;
-              Object.keys(d.usr).forEach((key) => {
-                userNum += d.usr[key].length;
-              });
-              cData.push([new Date(d.time), userNum]);
-            } 
-            else {
-              var userNum = 0;
-              Object.keys(d.usr).forEach((key) => {
-                userNum += d.usr[key].length;
-              });
-              cData[cData.length - 1][1] = userNum;
-            }
-          });
+      .then(files => {
+        async.map(files, function(item, callback) {
+          fetch(`/api/file/${item}`)
+            .then(res => res.json())
+            .then(data => {
+              console.log(data);
+              if (data.length !== 0 ) {
+                let cData = [];
+                data.forEach((d, i) => {
+                  if (i === 0 || new Date(d.time).getTime() !== cData[cData.length - 1][0].getTime()) {
+                    var userNum = 0;
+                    Object.keys(d.usr).forEach((key) => {
+                      userNum += d.usr[key];
+                    });
+                    cData.push([new Date(d.time), userNum]);
+                  } 
+                  else {
+                    var userNum = 0;
+                    Object.keys(d.usr).forEach((key) => {
+                      userNum += d.usr[key];
+                    });
+                    cData[cData.length - 1][1] = userNum;
+                  }
+                });
+                callback(null, cData);
+              }
+            });
+        }, function(err, result) {
+          async.each(result, (r) => {
+            concatData = concatData.concat(r);
+          }, (err) => {});
           this.setState({
-            data: cData
-          });
-        }
-      });
-  }
+            data: concatData,
+          })
+        }.bind(this));
+      })
+    }
 
   handleClickDay() {
     const date = new Date();

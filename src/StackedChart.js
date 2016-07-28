@@ -37,12 +37,12 @@ class StackedChart extends Component {
                   scData.push(new Array(agents.length + 1));
                   scData[scData.length - 1][0] = new Date(d.time);
                   agents.forEach((a, ia) => {
-                    scData[scData.length - 1][ia + 1] = d.usr[a].length;
+                    scData[scData.length - 1][ia + 1] = d.usr[a];
                   });
                 } 
                 else {
                   agents.forEach((a, ia) => {
-                    scData[scData.length - 1][ia + 1] = d.usr[a].length;
+                    scData[scData.length - 1][ia + 1] = d.usr[a];
                   });
                 }
               });
@@ -58,32 +58,6 @@ class StackedChart extends Component {
           })
         }.bind(this));
       });
-    //fetch(`/api/${sDate}`)
-      //.then(res => res.json())
-      //.then(data => {
-        //let scData = [];
-        //const agents = ['CSB-i', 'CSB-A', 'CSB-W', 'CDt', 'LoginApp', 'Mac', 'Others'];
-
-        //data.forEach((d, i) => {
-          //if (i === 0 ||
-            //new Date(d.time).getTime() !== scData[scData.length - 1][0].getTime()) {
-            //scData.push(new Array(agents.length + 1));
-            //scData[scData.length - 1][0] = new Date(d.time);
-            //agents.forEach((a, ia) => {
-              //scData[scData.length - 1][ia + 1] = d.usr[a].length;
-            //});
-          //} 
-          //else {
-            //agents.forEach((a, ia) => {
-              //scData[scData.length - 1][ia + 1] = d.usr[a].length;
-            //});
-          //}
-        //});
-        //this.setState({
-          //data: scData,
-          //agents: agents
-        //});
-      //});
   }
 
   handleClickDay() {

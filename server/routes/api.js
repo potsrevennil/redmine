@@ -6,6 +6,7 @@ const logDir = `${__dirname}/../logFiles`;
 const DBDir = `${__dirname}/../db`
 
 var obj = {};
+var usr = {'CSB-i':[], 'CSB-A':[], 'CSB-W':[], 'CDt':[], 'LoginApp':[], 'Mac':[], 'Others':[]};
 
 //obj['agent'] = 'CSB-i';
 //obj['usr'][obj['agent']].push('x');
@@ -43,20 +44,23 @@ fs.readdir(logDir, (err, files) => {
             };
 
             if (Object.getOwnPropertyNames(obj).length === 0) {
-              obj['usr'] = {'CSB-i':[], 'CSB-A':[], 'CSB-W':[], 'CDt':[], 'LoginApp':[], 'Mac':[], 'Others':[]};
+              obj['usr'] = {'CSB-i':0, 'CSB-A':0, 'CSB-W':0, 'CDt':0, 'LoginApp':0, 'Mac':0, 'Others':0};
               if (eventId === '10' && messageString.indexOf('successful') !== -1) {
-                obj['usr'][agent].push(faa[0]);
+                usr[agent].push(faa[0]);
+                obj['usr'][agent] = usr[agent].length;
               }
             } 
             else {
               if (eventId === '10' && messageString.indexOf('successful') !== -1) {
-                if (obj['usr'][agent].indexOf(faa[0]) === -1) {
-                  obj['usr'][agent].push(faa[0]);
+                if (usr[agent].indexOf(faa[0]) === -1) {
+                  usr[agent].push(faa[0]);
+                  obj['usr'][agent] = usr[agent].length;
                 }
               } else if (eventId === '85') {
-                const iusr = obj['usr'][agent].indexOf(faa[0]);
+                const iusr = usr[agent].indexOf(faa[0]);
                 if ( iusr !== -1) {
-                  obj['usr'][agent].splice(iusr, 1);
+                  usr[agent].splice(iusr, 1);
+                  obj['usr'][agent] = usr[agent].length;
                 } else {
                   return;
                 }
@@ -90,43 +94,13 @@ router.get('/:date', function(req, res, next) {
     });
 
     return res.json(JSON.parse(JSON.stringify(dateFiles)));
-    // if only one file, then show the data of previous day also
-    //if (dateFiles.length === 1) {
-      //const today = new Date(`${dateFiles[0].substring(7, 11)}/${dateFiles[0].substring(11, 13)}/${dateFiles[0].substring(13, 15)}`);
-      //const yesterday = new Date(today.setDate(today.getDate() - 1));
-      //// convert the date of yesterday to => ex: 20160727
-      //const yDate = yesterday.getFullYear() 
-        //+ ('0' + (yesterday.getMonth()+1)).slice(-2)
-        //+ ('0' + yesterday.getDate()).slice(-2);
-      
-        //try {
-          //const stats = fs.lstatSync(`${DBDir}/EVENTS_${yDate}.json`);
-          //if (stats.isFile()) {
-            //dateFiles.splice(0, 0, `EVENTS_${yDate}.json`); 
-          //}
-        //} catch (e) {};
-    //}
-
-    //function readCallback(err, data) {};
-
-    //function readAsync(file, readCallback) {
-      //fs.readFile(`${DBDir}/${file}`, 'utf-8', readCallback);
-    //};
-    //async.map(dateFiles, readAsync, (err, result) => {
-      //var jdata = [];
-      //async.each(result, (r) => {
-        //jdata = jdata.concat(JSON.parse(r));
-      //}, (err) => {});
-      //return res.json(jdata);
-    //});
-    
   });
 })
 
-  router.get('/file/:fileName', function(req, res, next) {
-    fs.readFile(`${DBDir}/${req.params.fileName}`, 'utf-8', (err, data) => {
-      return res.json(JSON.parse(data));
-    })
+router.get('/file/:fileName', function(req, res, next) {
+  fs.readFile(`${DBDir}/${req.params.fileName}`, 'utf-8', (err, data) => {
+    return res.json(JSON.parse(data));
+  })
 
-  });
+});
 module.exports = router;
