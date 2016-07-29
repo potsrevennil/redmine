@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import fetch from 'isomorphic-fetch';
 import dygraph from 'dygraphs';
 import async from 'async';
+import update from 'react-addons-update';
 
 
 class Chart extends Component {
@@ -36,13 +37,12 @@ class Chart extends Component {
                     usrNum += ud;
                   }
                 })
-                cData.push([new Date(d[0]), usrNum]);
-                console.log(cData);
                 if (i !== 0) {
-                  if (cData[cData.length - 2][0].getTime() === cData[cData.length - 1][0].getTime()) {
-                    cData.splice(cData.length - 2, 1);
+                  if (new Date(d[0]).getTime() === cData[cData.length - 1][0].getTime()) {
+                    cData.pop();
                   }
                 }
+                cData.push([new Date(d[0]), usrNum]);
               })
               callback(null, cData);
             });
@@ -51,7 +51,7 @@ class Chart extends Component {
             concatData = concatData.concat(r);
           }, (err) => {});
           this.setState({
-            data: concatData,
+            data: update(this.state.data, {$set: concatData}),
           })
         }.bind(this));
       })

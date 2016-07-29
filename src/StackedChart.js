@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import fetch from 'isomorphic-fetch';
 import dygraph from 'dygraphs';
 import async from 'async';
+import update from 'react-addons-update';
 
 class StackedChart extends Component {
   constructor() {
     super()
     this.state = {
-      data: [[new Date(0), 0]],
-      agents: [''],
+      data: [[new Date(0), 0, 0, 0, 0, 0, 0, 0]],
+      agents: ['CSB-i', 'CSB-A', 'CSB-W', 'CDt', 'LoginApp', 'Mac', 'Others'],
       value: ''
     };
     this.handleClickDay = this.handleClickDay.bind(this);
@@ -20,7 +21,6 @@ class StackedChart extends Component {
   }
 
   handleClick(sDate) {
-    const agents = ['CSB-i', 'CSB-A', 'CSB-W', 'CDt', 'LoginApp', 'Mac', 'Others'];
     var concatData = [];
     fetch(`/api/${sDate}`)
       .then(res => res.json())
@@ -29,27 +29,24 @@ class StackedChart extends Component {
           fetch(`/api/file/${item}`)
             .then(res => res.json())
             .then(data => {
-              var spliceIndex = [];
+              const scData = [];
               data.forEach((d, i) => {
                 d[0] = new Date(d[0]);
                 if (i !== 0) {
-                  if (d[0].getTime() === data[i - 1][0].getTime()) {
-                    spliceIndex.push(i - 1);
+                  if (d[0].getTime() === scData[scData.length - 1][0].getTime()) {
+                    scData.pop();
                   }
                 }
+                scData.push(d);
               })
-              spliceIndex.forEach((s) => {
-                data.splice(s, 1);
-              })
-              callback(null, data);
+              callback(null, scData);
             });
         }, function(err, result) {
           async.each(result, (r) => {
             concatData = concatData.concat(r);
           }, (err) => {});
           this.setState({
-            data: concatData,
-            agents: agents
+            data: update(this.state.data, {$set: concatData}),
           })
         }.bind(this));
       });
@@ -80,7 +77,10 @@ class StackedChart extends Component {
   }
 
   handleChange(event) {
-    this.setState({value: event.target.value});
+    console.log(event.target.value);
+    this.setState({
+      value: update(this.state.value, {$set: event.target.value})
+    });
   }
 
   handleSubmit(event) {
